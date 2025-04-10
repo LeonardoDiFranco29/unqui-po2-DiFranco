@@ -12,7 +12,7 @@ public class NumeroConMasParesTest {
 
         int resultado = NumeroConMasPares.numeroConMasDigitosPares(numeros);
 
-        // 8888 tiene 4 dígitos pares: 8,8,8,8
+        // 8888 tiene 4 dígitos pares: 8,8,8,8 y tambien 2468
         assertTrue(resultado == 2468 || resultado == 8888);
     }
 
