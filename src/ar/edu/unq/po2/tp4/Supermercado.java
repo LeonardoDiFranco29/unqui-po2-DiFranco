@@ -26,5 +26,13 @@ public class Supermercado {
         return productos.stream()
                         .mapToDouble(p -> p.getPrecio())
                         .sum();
+        
+        /*
+         * double total = 0;
+			for (Producto p : productos) {
+    			total += p.getPrecio();
+				}
+			return total;  
+         * */
     }
 }
