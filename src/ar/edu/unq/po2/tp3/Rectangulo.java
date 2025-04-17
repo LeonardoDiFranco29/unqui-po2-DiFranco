@@ -27,12 +27,12 @@ public class Rectangulo {
 
     // 4. Determinar si es horizontal
     public boolean esHorizontal() {
-        return ancho > alto;
+        return ancho >= alto;
     }
 
     // 4. Determinar si es vertical
     public boolean esVertical() {
-        return alto > ancho;
+        return alto >= ancho;
     }
 
     // Getters opcionales
