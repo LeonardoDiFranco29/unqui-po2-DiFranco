@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>unqui-po2-DiFranco</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>src/ar/edu/unq/po2/tp6/solid/ClienteEMail.java</name>
+			<type>1</type>
+			<location>C:/Users/PC/Documents/desca/clienteDeEmail/caso1/ClienteEMail.java</location>
+		</link>
+		<link>
+			<name>src/ar/edu/unq/po2/tp6/solid/Correo.java</name>
+			<type>1</type>
+			<location>C:/Users/PC/Documents/desca/clienteDeEmail/caso1/Correo.java</location>
+		</link>
+		<link>
+			<name>src/ar/edu/unq/po2/tp6/solid/IServidor.java</name>
+			<type>1</type>
+			<location>C:/Users/PC/Documents/desca/clienteDeEmail/caso1/IServidor.java</location>
+		</link>
+		<link>
+			<name>src/ar/edu/unq/po2/tp6/solid/ServidorPop.java</name>
+			<type>1</type>
+			<location>C:/Users/PC/Documents/desca/clienteDeEmail/caso1/ServidorPop.java</location>
+		</link>
+	</linkedResources>
+</projectDescription>
