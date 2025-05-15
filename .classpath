@@ -13,11 +13,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/PC/Documents/desca/mockito-core-5.14.2.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/PC/Documents/desca/net.bytebuddy.byte-buddy-agent_1.15.7.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
