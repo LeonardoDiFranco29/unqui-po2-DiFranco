@@ -22,7 +22,7 @@ public class ServidorPop implements IReceptorCorreo, IEmisorCorreo {
 
     @Override
     public void enviar(Correo correo) {
-        // Simulación de envío de correo
+        // Simulacion de envío de correo
         System.out.println("Enviando correo a: " + correo.getDestinatario() + " con asunto: " + correo.getAsunto());
         // Aquí iría la lógica real de envío
         System.out.println("Correo enviado.");
