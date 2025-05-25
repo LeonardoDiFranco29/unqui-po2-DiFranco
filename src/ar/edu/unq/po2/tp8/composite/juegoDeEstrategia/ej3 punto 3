@@ -1,0 +1,20 @@
+3. Indique los participantes y roles de aquellos patrones de diseño que utilizó en su solución.
+En esta solución, el único patrón de diseño utilizado es el Composite. El patrón Strategy fue explícitamente omitido.
+
+Patrón Composite
+Intención: Componer objetos en estructuras de árbol para representar jerarquías parte-todo. Permite a los clientes tratar a objetos individuales y composiciones de objetos de manera uniforme.
+
+Participantes y Roles:
+
+Component (Componente): Character (Interfaz)
+
+Rol: Declara la interfaz común para los objetos en la composición. Tanto los objetos individuales (hojas) como los contenedores (compuestos) implementarán o heredarán de esta interfaz.
+En la implementación: Define el método move(Position destination) que todos los personajes y ejércitos deben poder realizar. También incluye getId() y getCurrentPosition().
+Leaf (Hoja): Engineer, Knight (Clases)
+
+Rol: Representa los objetos de la composición que no tienen hijos. Son los elementos terminales de la jerarquía.
+En la implementación: Engineer y Knight son personajes individuales. Implementan directamente el método move() con su lógica de movimiento específica (ruta más corta para Engineer, zigzag para Knight), y no pueden contener otros Characters.
+Composite (Compuesto): Army (Clase)
+
+Rol: Define el comportamiento de los componentes que tienen hijos, y almacena esos componentes hijos. Implementa las operaciones del Componente delegando a sus hijos.
+En la implementación: Army es un Character que puede contener una lista de otros Characters (que pueden ser Engineer, Knight o incluso otros Armys). Su método move() itera sobre sus unidades y llama al método move() en cada una de ellas, propagando la acción a toda la jerarquía. Incluye métodos para agregar y eliminar unidades (addUnit, removeUnit).
