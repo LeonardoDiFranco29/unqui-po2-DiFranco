@@ -1,0 +1,33 @@
+1. ¿Cómo se logra tratar de manera uniforme objetos individuales y compuestos con el patrón Composite?
+Esto se logra principalmente a través de la abstracción y la delegación a una interfaz o clase abstracta común.
+
+Interfaz/Clase Abstracta Común (Componente): El patrón Composite define una interfaz (o una clase abstracta) que declara las operaciones que son comunes tanto para los objetos individuales (Leaf) como para los compuestos (Composite). Esta interfaz es la clave para la uniformidad. El cliente interactúa siempre con esta interfaz común, sin saber si el objeto subyacente es una hoja o un compuesto.
+
+Clase Hoja (Leaf): Representa los objetos individuales en la jerarquía. Implementa la interfaz Componente y define el comportamiento para las operaciones básicas. Estas clases no tienen hijos.
+
+Clase Compuesta (Composite): Representa los objetos que pueden contener a otros componentes (ya sean hojas o sub-composites). También implementa la misma interfaz Componente. Para las operaciones definidas en la interfaz, el Composite delega la llamada a sus hijos. Esto significa que itera sobre sus hijos y llama a la misma operación en cada uno de ellos.
+
+En resumen: El cliente interactúa con una abstracción común. Las hojas implementan el comportamiento directamente, mientras que los compuestos delegan la ejecución a sus hijos de forma recursiva. Esta recursividad es lo que permite que una operación sobre un Composite se propague por toda la estructura, tratando a todos los elementos por igual.
+
+2. ¿En qué casos aplicaría el patrón Composite?
+Aplicarías el patrón Composite en los siguientes escenarios:
+
+Representación de jerarquías parte-todo: Cuando tus objetos se pueden organizar en una estructura de árbol, donde los "todos" (composites) están compuestos por "partes" (hojas o sub-composites). Ejemplos:
+
+Sistemas de archivos: Carpetas (Composite) que contienen archivos (Leaf) y otras carpetas (Composite).
+Interfaces gráficas de usuario (GUI): Un formulario (Composite) que contiene botones (Leaf), paneles (Composite) y cajas de texto (Leaf). Un panel a su vez puede contener otros elementos.
+Estructuras organizacionales: Departamentos (Composite) que contienen empleados (Leaf) y otros sub-departamentos (Composite).
+Menús: Un menú principal (Composite) que tiene ítems de menú (Leaf) y submenús (Composite).
+Expresiones matemáticas: Una expresión compleja (Composite) que está compuesta por números (Leaf) y operaciones (Composite) que a su vez operan sobre otras expresiones.
+Cuando los clientes deben ignorar si trabajan con objetos individuales o grupos de objetos: Si quieres que el código cliente sea más simple y no necesite ramificaciones (if-else o instanceof) para saber si está tratando con un único elemento o con un grupo. El Composite permite que el cliente trate a todos los objetos de la jerarquía de manera uniforme a través de la interfaz común.
+
+Simplificar la lógica del cliente: Al evitar que el cliente tenga que diferenciar entre objetos simples y complejos, el código del cliente se vuelve más limpio, más fácil de escribir y menos propenso a errores al manejar la estructura jerárquica.
+
+3. ¿Qué elementos de la programación orientada a objetos hacen posible que los clientes no sean conscientes si interactúan con una hoja o una composición?
+Los elementos clave de la Programación Orientada a Objetos (POO) que hacen posible esta transparencia en el cliente son:
+
+Polimorfismo: Este es el pilar fundamental. Gracias al polimorfismo, el cliente puede interactuar con una variable de tipo Component (la interfaz o clase abstracta). Cuando se llama a un método en esa variable, Java (u otro lenguaje POO) determina en tiempo de ejecución qué implementación específica del método debe ejecutarse (la de la clase Leaf o la de la clase Composite). El cliente "no sabe" ni le importa si la referencia apunta a un objeto Leaf o a un objeto Composite.
+
+Herencia (o Implementación de Interfaz): Todas las clases Leaf y Composite heredan de (o implementan) la misma interfaz o clase abstracta Component. Esto asegura que todas ellas compartan un contrato común de métodos, lo que habilita el polimorfismo.
+
+Encapsulamiento: Aunque no es tan directo como el polimorfismo, el encapsulamiento contribuye al ocultar los detalles internos de cómo un Composite maneja sus hijos (por ejemplo, cómo los agrega, elimina o itera sobre ellos). El cliente solo ve los métodos de la interfaz Componente y no necesita conocer la estructura interna del Composite.
