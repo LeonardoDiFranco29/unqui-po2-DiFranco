@@ -1,0 +1,117 @@
+Modelado (Diagrama de Clases UML Implícito)
+Vamos a definir los roles del patrón Composite:
+
+Componente (Component): Parcela (Interfaz/Clase Abstracta)
+
+Declara las operaciones que serán comunes para todas las porciones de tierra, ya sean simples o compuestas.
+Operaciones: calcularGananciaAnualSoja(), calcularGananciaAnualTrigo().
+Hoja (Leaf): ParcelaCultivoSimple
+
+Representa una porción de tierra que contiene un único tipo de cultivo (Soja o Trigo).
+No tiene hijos.
+Implementa las operaciones de Parcela directamente, basándose en su tipo de cultivo.
+Compuesto (Composite): ParcelaMixta
+
+Representa una porción de tierra dividida en cuatro sub-regiones iguales.
+Contiene una colección de objetos Parcela (sus hijos).
+Implementa las operaciones de Parcela delegando el cálculo a sus hijos y sumando los resultados.
+1. ¿Qué impacto genera en su diseño el hecho de compartir instancias de parcelas entre composiciones? Es decir, que la misma instancia se encuentre en más de una composición.
+Compartir instancias de parcelas entre composiciones (que la misma ParcelaCultivoSimple o ParcelaMixta sea hijo de múltiples ParcelaMixtas) tiene varios impactos significativos:
+
+Impacto en el Diseño y la Implementación:
+
+Dificultad para modelar la estructura de árbol puro: El patrón Composite asume típicamente una estructura de árbol o grafo acíclico dirigido (DAG), donde cada nodo tiene un único padre o no tiene ninguno. Si una misma instancia de Parcela puede estar en más de una ParcelaMixta, la estructura ya no es un árbol puro, sino un grafo general. Esto implica que:
+
+Jerarquía de padres: Si una parcela necesita conocer a su padre (por ejemplo, para cálculos proporcionales en relación al padre), este modelo se complica. En un árbol, un nodo tiene un único padre. En un grafo, puede tener múltiples padres.
+Ciclos: Se vuelve posible (y potencialmente problemático) introducir ciclos en la estructura (Porción A contiene Porción B, y Porción B contiene Porción A), lo que llevaría a bucles infinitos en cálculos recursivos. Tu diseño debe evitar esto.
+Cálculo de Ganancias (Doble Conteo): Este es el impacto más crítico para este problema. Si una Parcela es compartida, su ganancia se contaría múltiples veces si se invoca el cálculo desde diferentes parcelas compuestas que la contienen.
+
+Ejemplo: Si "ParcelaSojaPequeña" se usa en "ParcelaMixta1" y "ParcelaMixta2", y luego calculas la ganancia de "ParcelaMixta1" y "ParcelaMixta2" por separado y las sumas, la ganancia de "ParcelaSojaPequeña" se suma dos veces.
+Solución: Para evitar el doble conteo, tendrías que modificar la lógica de cálculo para que, cuando se acceda a una parcela compartida, su ganancia se prorratee o se calcule solo una vez en un contexto global y luego se distribuya. Esto añade complejidad al cálculo, ya que el componente Leaf o Composite necesitaría saber cuántos padres lo contienen o si ya ha sido "visitado" en la iteración actual. Una solución común es mantener un conjunto de elementos ya visitados (Set<Parcela> visited) durante una travesía.
+Gestión del Estado Mutante: Si las parcelas son mutables (por ejemplo, si se puede cambiar el cultivo de una ParcelaCultivoSimple o reconfigurar una ParcelaMixta), y una instancia es compartida, un cambio en esa instancia afectará a todas las composiciones que la contengan. Esto puede ser deseable o una fuente de errores difíciles de depurar, dependiendo de los requisitos.
+
+Implicaciones en la eliminación: Si eliminas una parcela compartida de una composición, ¿debería ser eliminada de todas? ¿O simplemente se rompe la relación con una composición específica? Esto requiere una lógica de gestión de referencias más sofisticada.
+
+En resumen: Compartir instancias complica el modelo de árbol puro del Composite, especialmente en el cálculo de propiedades acumulativas como la ganancia, donde se debe evitar el doble conteo. Generalmente, en un patrón Composite "puro", los componentes hijos son exclusivos de un solo padre, o al menos el cálculo de propiedades es unidireccional y se cuida de no contar múltiples veces. Si necesitas compartir, debes ser muy consciente de las implicaciones y adaptar la lógica de travesía y cálculo para manejarlo.
+
+Para este problema específico, la imagen sugiere que las subdivisiones son nuevas instancias (una Soja $500 se subdivide en cuatro sub-parcelas, pero la Soja $500 original también aparece en otra parte de la imagen, lo que podría implicar que son copias o que es una instancia "tipo"). Si la subdivisión crea nuevas parcelas, entonces el problema de compartir instancias no aplica directamente a las porciones generadas por subdivisión, sino solo si tú decides reutilizar manualmente una misma instancia de Parcela en diferentes ramas de tu árbol. Asumiremos que al subdividir, se crean nuevas instancias de las sub-parcelas, lo que es una simplificación común para Composite.
+
+3. Describa las alternativas que puede utilizar para calcular la ganancia anual. Relacione las alternativas.
+Existen principalmente dos alternativas para calcular la ganancia anual dentro del patrón Composite, relacionadas con dónde se coloca la lógica de recorrido y cálculo:
+
+Cálculo en los métodos del Componente (Implementado aquí):
+
+Descripción: La lógica para calcular la ganancia (ya sea calcularGananciaAnualSoja o calcularGananciaAnualTrigo) se define como parte de la interfaz Parcela.
+Las ParcelaCultivoSimple (Leaf) implementan el cálculo directamente para su tipo.
+Las ParcelaMixta (Composite) implementan el cálculo iterando sobre sus hijos y llamando recursivamente al mismo método en cada uno de ellos, sumando los resultados (y dividiendo por 4 en este caso).
+Ventajas:
+Encapsulamiento: La lógica de cálculo está encapsulada dentro de las propias clases que representan la estructura.
+Transparencia: El cliente solo llama a un método en la interfaz Parcela (parcela.calcularGananciaAnualSoja()) sin preocuparse por la complejidad interna de la jerarquía.
+Extensibilidad: Es fácil añadir nuevos tipos de ParcelaCultivoSimple o ParcelaMixta siempre que implementen la interfaz Parcela.
+Desventajas:
+Acoplamiento: Añadir una nueva operación (ej. calcularUsoAguaAnual()) requeriría modificar la interfaz Parcela y, por lo tanto, todas las clases Leaf y Composite que la implementan. Esto va en contra del principio Open/Closed.
+Dificultad para agregar nuevas operaciones: Si las operaciones de cálculo son numerosas o cambian con frecuencia, este enfoque puede volverse rígido.
+Cálculo usando el Patrón Visitor:
+
+Descripción: En lugar de tener los métodos de cálculo directamente en la interfaz Parcela, se introduce una nueva interfaz Visitor con un método visit() para cada tipo concreto de Componente (es decir, visit(ParcelaCultivoSimple) y visit(ParcelaMixta)). Cada clase Componente tendría un método accept(Visitor visitor) que llama al método visit() correspondiente en el Visitor.
+Un CalculadorGananciaAnualVisitor implementaría la lógica de cálculo dentro de sus métodos visit().
+Ventajas:
+Separación de Preocupaciones (Cohesión): La lógica de cálculo se separa de la estructura del objeto. Las operaciones de recorrido y cálculo están centralizadas en la clase Visitor.
+Extensibilidad para nuevas operaciones: Si necesitas añadir un nuevo tipo de cálculo (ej. calcularHuellaCarbono()), simplemente creas una nueva clase Visitor sin modificar las clases Parcela, ParcelaCultivoSimple o ParcelaMixta. Esto adhiere al principio Open/Closed.
+Desventajas:
+Mayor complejidad inicial: Requiere más clases (la interfaz Visitor y sus implementaciones concretas).
+Acoplamiento con la estructura del Visitor: Si la jerarquía de Componente cambia (se añade un nuevo tipo de Parcela), se debe modificar la interfaz Visitor y todas sus implementaciones existentes.
+Transparencia comprometida: El cliente ya no puede simplemente llamar a parcela.calcularGanancia() sino que debe crear un Visitor y "aceptarlo" (parcela.accept(calculador)).
+Relación entre las alternativas:
+
+Ambas alternativas son válidas y utilizan el patrón Composite para modelar la jerarquía. La elección entre ellas depende de la dirección principal de la "extensión" que se espera en el sistema:
+
+Si es más probable que se añadan nuevos tipos de parcelas (e.g., ParcelaConInvernadero, ParcelaArbolesFrutales) pero las operaciones de cálculo (ganancia, costo, etc.) se mantienen estables, la Opción 1 (cálculo en el Componente) es más simple y directa.
+Si es más probable que se añadan nuevas formas de calcular o analizar la estructura (e.g., calcularGananciaPorRegion, generarReporteCSV, calcularImpuestos) sin que la estructura de las parcelas cambie mucho, entonces el Patrón Visitor sería una mejor elección por su extensibilidad en operaciones.
+Para este problema específico, donde las operaciones de cálculo son fijas (gananciaSoja, gananciaTrigo), la Opción 1 es más directa y suficiente, que es la que se implementó.
+
+4. Explique la discusión sobre quiénes deben implementar las operaciones de agregado y borrado de hijos.
+Esta discusión se refiere a dónde se deben declarar los métodos para agregar (add()) y eliminar (remove()) componentes hijos en la jerarquía del Composite:
+
+En la interfaz Componente (Enfoque "Seguro para el Cliente" / "Transparente"):
+
+Descripción: Se declaran add(Component) y remove(Component) directamente en la interfaz Parcela.
+Implementación:
+La clase ParcelaMixta (Composite) implementa estos métodos añadiendo/removiendo hijos a su lista interna.
+La clase ParcelaCultivoSimple (Leaf) implementa estos métodos de forma "vacía" o lanzando una excepción (UnsupportedOperationException), ya que una hoja no puede tener hijos.
+Ventajas:
+Transparencia: El cliente puede llamar a add() o remove() en cualquier objeto de tipo Parcela, sin saber si es una hoja o un compuesto. Esto simplifica el código del cliente.
+Desventajas:
+Violación de Liskov Substitution Principle (LSP): Una ParcelaCultivoSimple (Leaf) no puede realizar la operación de agregar/eliminar hijos, a pesar de que la interfaz Parcela lo declare. Esto significa que la subclase (Leaf) no es completamente sustituible por su supertipo (Componente) en este aspecto, ya que fallaría al intentar agregar hijos. Esto se considera un "smell" de diseño.
+Código innecesario: Las hojas tienen métodos que no utilizan o que deben lanzar excepciones, lo que puede ser confuso.
+Solo en la clase Composite (Enfoque "Seguro para la Estructura" / "Seguro para el Cliente"):
+
+Descripción: Los métodos add(Component) y remove(Component) se declaran y definen solo en la clase ParcelaMixta (Composite). La interfaz Parcela NO declara estos métodos.
+Ventajas:
+Adherencia a LSP: Las hojas no están obligadas a implementar operaciones que no les corresponden, respetando el principio de sustitución de Liskov.
+Código más limpio: Las clases Leaf son más simples, sin métodos vacíos o que lancen excepciones.
+Desventajas:
+Pérdida de Transparencia: El cliente ya no puede tratar a todas las Parcelas de manera uniforme para agregar/eliminar hijos. Si el cliente tiene una variable de tipo Parcela y quiere agregar un hijo, primero debe verificar si es una instancia de ParcelaMixta (if (parcela instanceof ParcelaMixta)) y luego hacer un "cast" (((ParcelaMixta) parcela).add(...)). Esto introduce lógica de ramificación en el cliente.
+Discusión y Elección:
+
+No hay una respuesta única "correcta"; depende del equilibrio entre transparencia para el cliente y seguridad de tipo/adherencia a LSP.
+
+Si la transparencia del cliente es primordial y la mayoría de las operaciones se aplican a ambos tipos de componentes, el enfoque de poner add/remove en el Componente puede ser aceptable, asumiendo que el costo de la excepción en las hojas es bajo y raro.
+Si la seguridad de tipo y la pureza del LSP son más importantes, y la adición/eliminación de hijos es una operación que el cliente rara vez realiza de forma polimórfica (es decir, el cliente normalmente sabe si está construyendo un compuesto), entonces es mejor poner los métodos solo en el Composite.
+En la implementación proporcionada para este problema, no incluí add/remove en la interfaz Parcela. En su lugar, usé setSubParcela(index, parcela) en ParcelaMixta. Esto se alinea con el enfoque "Solo en la clase Composite", ya que la ParcelaMixta tiene una estructura fija de 4 regiones y las parcelas no se "agregan" dinámicamente sino que se "establecen" en una posición específica. Si el diseño requiriera agregar un número variable de parcelas, se usarían add/remove en ParcelaMixta.
+
+5. Sobre su implementación, indique los roles que desempeñan cada una de las clases diseñadas en relación al patrón Composite.
+En la implementación Java proporcionada:
+
+Parcela (Interfaz):
+
+Rol: Componente (Component)
+Descripción: Es la interfaz base que define las operaciones comunes (calcularGananciaAnualSoja(), calcularGananciaAnualTrigo()) para todos los elementos en la jerarquía (hojas y compuestos). Los clientes interactúan con esta interfaz para tratar de manera uniforme tanto las parcelas de cultivo simples como las parcelas mixtas.
+ParcelaCultivoSimple (Clase):
+
+Rol: Hoja (Leaf)
+Descripción: Representa el objeto primitivo o "terminal" en la jerarquía. No contiene otros componentes. Implementa las operaciones definidas en la interfaz Parcela directamente, proporcionando el valor de ganancia para un tipo de cultivo específico (soja o trigo).
+ParcelaMixta (Clase):
+
+Rol: Compuesto (Composite)
+Descripción: Representa un objeto que puede contener otros componentes (Parcela). Mantiene una colección de sus subParcelas (que pueden ser ParcelaCultivoSimple o incluso otras ParcelaMixta). Implementa las operaciones de la interfaz Parcela delegando el cálculo a sus hijos de forma recursiva y combinando sus resultados (prorrateando por 4, ya que cada sub-región es un cuarto de la parcela mixta). También es responsable de gestionar sus hijos a través del método setSubParcela().
